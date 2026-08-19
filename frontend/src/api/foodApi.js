@@ -64,3 +64,13 @@ export async function changeGoal(goal) {
   }
   return res.json();
 }
+
+export async function getSuggestions() {
+  const res = await fetch(`${API_BASE_URL}/suggestions`);
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Failed to fetch suggestions');
+  }
+  return res.json();
+}
+

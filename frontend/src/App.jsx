@@ -5,6 +5,7 @@ import MacroBars from './components/MacroBars';
 import LoggingPanel from './components/LoggingPanel';
 import FoodHistoryList from './components/FoodHistoryList';
 import WarningModal from './components/WarningModal';
+import SuggestionCard from './components/SuggestionCard';
 import { 
   getFoodSummary, 
   addFoodItem, 
@@ -170,6 +171,9 @@ export default function App() {
           
           {/* Macronutrients Progress Bars */}
           <MacroBars totals={totals} targets={targets} />
+
+          {/* Smart Food Suggestions */}
+          <SuggestionCard totals={totals} targets={targets} />
 
           {/* Logged Meal History */}
           <FoodHistoryList 
