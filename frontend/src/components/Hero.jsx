@@ -54,7 +54,7 @@ export default function Hero() {
         </div>
         <div className="metric-pill">
           <span className="metric-pill-icon">⚡</span>
-          <span className="metric-pill-text">Sub-5ms Server-Side Recalculation</span>
+          <span className="metric-pill-text">Instant recalculation — no page reload</span>
         </div>
         <div className="metric-pill">
           <span className="metric-pill-icon">🔄</span>

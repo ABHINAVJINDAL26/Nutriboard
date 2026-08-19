@@ -1,7 +1,14 @@
 import React from 'react';
+import { useBalanceEasterEgg } from '../hooks/useBalanceEasterEgg';
 
 export default function BalanceGauge({ score = 100, status = 'balanced' }) {
-  const normalizedScore = Math.min(100, Math.max(0, Math.round(score)));
+  const { isTriggered, prefersReducedMotion } = useBalanceEasterEgg();
+
+  // If easter egg triggered, show 100 / balanced without altering real data
+  const displayScore = isTriggered ? 100 : score;
+  const displayStatus = isTriggered ? 'balanced' : status;
+
+  const normalizedScore = Math.min(100, Math.max(0, Math.round(displayScore)));
 
   // SVG circular geometry
   const size = 100;
@@ -31,10 +38,10 @@ export default function BalanceGauge({ score = 100, status = 'balanced' }) {
     }
   };
 
-  const currentStatus = statusConfig[status] || statusConfig.balanced;
+  const currentStatus = statusConfig[displayStatus] || statusConfig.balanced;
 
   return (
-    <div className="glass-card balance-gauge-card">
+    <div className={`glass-card balance-gauge-card ${isTriggered ? 'easter-egg-active' : ''}`}>
       <div className="balance-gauge-info">
         <div className="balance-gauge-header">
           <span className="balance-gauge-icon">🎯</span>
@@ -43,16 +50,26 @@ export default function BalanceGauge({ score = 100, status = 'balanced' }) {
         <p className="balance-gauge-desc">
           Measures how accurately your macro proportions match your goal's ideal ratio.
         </p>
-        <span 
-          className="balance-gauge-badge"
-          style={{
-            color: currentStatus.color,
-            background: currentStatus.badgeBg,
-            borderColor: currentStatus.badgeBorder
-          }}
-        >
-          {currentStatus.label}
-        </span>
+
+        <div className="balance-gauge-badge-row">
+          <span 
+            className="balance-gauge-badge"
+            style={{
+              color: currentStatus.color,
+              background: currentStatus.badgeBg,
+              borderColor: currentStatus.badgeBorder
+            }}
+          >
+            {currentStatus.label}
+          </span>
+
+          {/* Easter Egg Notice (Displayed only on trigger, 0 layout shift) */}
+          {isTriggered && (
+            <span className="easter-egg-caption">
+              ✨ Perfect balance. (Demo state — not your real data.)
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="balance-gauge-svg-wrap">
@@ -81,7 +98,9 @@ export default function BalanceGauge({ score = 100, status = 'balanced' }) {
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
             style={{
-              transition: 'stroke-dashoffset 0.6s ease, stroke 0.4s ease'
+              transition: prefersReducedMotion 
+                ? 'none' 
+                : 'stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.4s ease'
             }}
           />
         </svg>
