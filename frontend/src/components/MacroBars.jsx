@@ -2,9 +2,9 @@ import React from 'react';
 
 export default function MacroBars({ totals, targets }) {
   const macros = [
-    { name: 'protein', value: totals.protein, target: targets.protein, colorClass: 'protein', icon: '🥩' },
-    { name: 'carbs', value: totals.carbs, target: targets.carbs, colorClass: 'carbs', icon: '🌾' },
-    { name: 'fats', value: totals.fats, target: targets.fats, colorClass: 'fats', icon: '🥑' }
+    { name: 'Protein', value: totals.protein, target: targets.protein, colorClass: 'protein', icon: '🥩' },
+    { name: 'Carbs', value: totals.carbs, target: targets.carbs, colorClass: 'carbs', icon: '🌾' },
+    { name: 'Fats', value: totals.fats, target: targets.fats, colorClass: 'fats', icon: '🥑' }
   ];
 
   return (

@@ -1,17 +1,15 @@
 import React from 'react';
 
 export default function BalanceGauge({ score = 100, status = 'balanced' }) {
-  // Normalize score between 0 and 100
   const normalizedScore = Math.min(100, Math.max(0, Math.round(score)));
 
   // SVG circular geometry
-  const size = 120;
-  const strokeWidth = 10;
+  const size = 100;
+  const strokeWidth = 9;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (normalizedScore / 100) * circumference;
 
-  // Status mapping
   const statusConfig = {
     balanced: {
       color: 'var(--color-ok, #10b981)',
@@ -36,37 +34,31 @@ export default function BalanceGauge({ score = 100, status = 'balanced' }) {
   const currentStatus = statusConfig[status] || statusConfig.balanced;
 
   return (
-    <div className="glass-card balance-gauge-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-          <span style={{ fontSize: '1.25rem' }}>🎯</span>
-          <h3 style={{ fontSize: '1.1rem', margin: 0, color: 'var(--text-primary)' }}>Macro Balance Score</h3>
+    <div className="glass-card balance-gauge-card">
+      <div className="balance-gauge-info">
+        <div className="balance-gauge-header">
+          <span className="balance-gauge-icon">🎯</span>
+          <h3 className="balance-gauge-title">Macro Balance Score</h3>
         </div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 0.75rem 0', lineHeight: 1.4 }}>
+        <p className="balance-gauge-desc">
           Measures how accurately your macro proportions match your goal's ideal ratio.
         </p>
         <span 
+          className="balance-gauge-badge"
           style={{
-            display: 'inline-block',
-            fontSize: '0.8rem',
-            fontWeight: 600,
-            padding: '0.25rem 0.65rem',
-            borderRadius: '9999px',
             color: currentStatus.color,
             background: currentStatus.badgeBg,
-            border: `1px solid ${currentStatus.badgeBorder}`
+            borderColor: currentStatus.badgeBorder
           }}
         >
           {currentStatus.label}
         </span>
       </div>
 
-      <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      <div className="balance-gauge-svg-wrap">
         <svg
-          width={size}
-          height={size}
           viewBox={`0 0 ${size} ${size}`}
-          style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+          className="balance-gauge-svg"
         >
           {/* Background Track Circle */}
           <circle
@@ -95,41 +87,11 @@ export default function BalanceGauge({ score = 100, status = 'balanced' }) {
         </svg>
 
         {/* Center Score Display */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none'
-          }}
-        >
-          <span
-            style={{
-              fontSize: '1.75rem',
-              fontWeight: 800,
-              fontFamily: 'var(--font-header, sans-serif)',
-              color: 'var(--text-primary)',
-              lineHeight: 1
-            }}
-          >
+        <div className="balance-gauge-center">
+          <span className="balance-gauge-num">
             {normalizedScore}
           </span>
-          <span
-            style={{
-              fontSize: '0.65rem',
-              fontWeight: 600,
-              color: 'var(--text-secondary)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginTop: '2px'
-            }}
-          >
+          <span className="balance-gauge-unit">
             / 100
           </span>
         </div>
