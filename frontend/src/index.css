@@ -756,3 +756,207 @@ h1, h2, h3, h4 {
     transform: translateY(0);
   }
 }
+
+/* ==========================================================
+   COMPREHENSIVE MULTI-DEVICE RESPONSIVENESS
+   Supports: Mobile (320px-480px), Phablets (481px-640px),
+   Tablets (641px-950px), Laptops (951px-1280px), Ultrawide (1440px+)
+   ========================================================== */
+
+/* Tablet & Smaller Laptops (<= 950px) */
+@media (max-width: 950px) {
+  .app-container {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .glass-card {
+    padding: 1.75rem;
+  }
+
+  .app-title {
+    font-size: 2.8rem;
+  }
+}
+
+/* Phablets & Mobile Landscape (<= 640px) */
+@media (max-width: 640px) {
+  .app-container {
+    padding: 1.75rem 1rem;
+  }
+
+  .app-header {
+    margin-bottom: 2rem;
+  }
+
+  .app-title {
+    font-size: 2.25rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.95rem;
+  }
+
+  /* Goal Selector turns into flexible buttons */
+  .goal-toggle-container {
+    margin-bottom: 2rem;
+    width: 100%;
+  }
+
+  .goal-toggle-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 0.35rem;
+    padding: 0.35rem;
+  }
+
+  .goal-btn {
+    flex: 1;
+    padding: 0.65rem 0.5rem;
+    font-size: 0.8rem;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .progress-card {
+    gap: 1.25rem;
+  }
+
+  .progress-values {
+    font-size: 2.2rem;
+  }
+
+  .macro-bars-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .macro-bar-container {
+    padding: 1rem;
+  }
+
+  .table-wrapper {
+    margin: 0 -0.5rem;
+    border-radius: 12px;
+  }
+
+  .meal-table {
+    min-width: 460px;
+    font-size: 0.875rem;
+  }
+
+  .meal-table th, 
+  .meal-table td {
+    padding: 0.85rem 0.75rem;
+  }
+
+  .modal-content {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .modal-icon {
+    font-size: 2.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .modal-title {
+    font-size: 1.4rem;
+  }
+
+  .modal-text {
+    font-size: 0.875rem;
+  }
+
+  .btn-dismiss {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+/* Small Mobile Phones (<= 480px) */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .app-title {
+    font-size: 1.95rem;
+  }
+
+  .glass-card {
+    padding: 1.25rem 1rem;
+    border-radius: 16px;
+  }
+
+  /* Stack Goal Selector vertically on extra narrow screens */
+  .goal-toggle-wrapper {
+    flex-direction: column;
+    border-radius: 14px;
+  }
+
+  .goal-btn {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .progress-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .progress-values {
+    font-size: 1.85rem;
+  }
+
+  .calorie-track-bar {
+    height: 26px;
+  }
+
+  /* Responsive Balance Gauge Card */
+  .balance-gauge-card {
+    flex-direction: column !important;
+    text-align: center;
+    gap: 1.25rem !important;
+    padding: 1.25rem 1rem !important;
+  }
+
+  .balance-gauge-card > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .logging-card-title,
+  .history-title {
+    font-size: 1.2rem;
+  }
+
+  .input-styled {
+    padding: 0.75rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.8rem;
+    font-size: 0.92rem;
+  }
+
+  .exceeded-alert-banner {
+    padding: 0.9rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Ensure smooth touch scrolling on iOS and mobile browsers */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
