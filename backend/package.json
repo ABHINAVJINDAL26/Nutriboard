@@ -1,7 +1,7 @@
 {
-  "name": "calorie-tracker-backend",
+  "name": "nutriboard-backend",
   "version": "1.0.0",
-  "description": "Backend API for Calorie Tracker & Macro Dashboard",
+  "description": "Backend API for Nutriboard Calorie & Macro Dashboard",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
