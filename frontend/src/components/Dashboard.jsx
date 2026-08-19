@@ -21,7 +21,9 @@ export default function Dashboard() {
   const [goal, setGoal] = useState('maintenance');
   const [status, setStatus] = useState('OK');
   const [balanceScore, setBalanceScore] = useState({ score: 100, status: 'balanced' });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLogging, setIsLogging] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [apiError, setApiError] = useState('');
 
@@ -31,16 +33,13 @@ export default function Dashboard() {
   }, []);
 
   const fetchSummary = async () => {
-    setIsLoading(true);
     setApiError('');
     try {
       const data = await getFoodSummary();
       updateDashboardState(data);
     } catch (err) {
       console.error(err);
-      setApiError('Unable to connect to the backend server. Make sure it is running on port 5000.');
-    } finally {
-      setIsLoading(false);
+      setApiError('Unable to connect to the backend server. Make sure it is running.');
     }
   };
 
@@ -56,7 +55,7 @@ export default function Dashboard() {
   };
 
   const handleLogFood = async (name, grams) => {
-    setIsLoading(true);
+    setIsLogging(true);
     setApiError('');
     try {
       const data = await addFoodItem(name, grams);
@@ -71,12 +70,12 @@ export default function Dashboard() {
       console.error(err);
       setApiError(err.message || 'Failed to log food item');
     } finally {
-      setIsLoading(false);
+      setIsLogging(false);
     }
   };
 
   const handleSimulateScan = async () => {
-    setIsLoading(true);
+    setIsScanning(true);
     setApiError('');
     try {
       const data = await simulateImageUpload();
@@ -90,12 +89,12 @@ export default function Dashboard() {
       console.error(err);
       setApiError('Failed to simulate food scan');
     } finally {
-      setIsLoading(false);
+      setIsScanning(false);
     }
   };
 
   const handleDeleteFood = async (id) => {
-    setIsLoading(true);
+    setDeletingId(id);
     setApiError('');
     try {
       const data = await deleteFoodItem(id);
@@ -104,13 +103,15 @@ export default function Dashboard() {
       console.error(err);
       setApiError('Failed to delete food item');
     } finally {
-      setIsLoading(false);
+      setDeletingId(null);
     }
   };
 
   const handleGoalChange = async (newGoal) => {
-    setIsLoading(true);
+    // 1. Optimistic UI update: instantly highlight clicked goal button with zero lag
+    setGoal(newGoal);
     setApiError('');
+
     try {
       const data = await changeGoal(newGoal);
       const wasExceeded = status === 'EXCEEDED';
@@ -123,8 +124,6 @@ export default function Dashboard() {
     } catch (err) {
       console.error(err);
       setApiError('Failed to update fitness goal');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -178,7 +177,7 @@ export default function Dashboard() {
           <FoodHistoryList 
             foods={foods} 
             onDeleteFood={handleDeleteFood} 
-            isLoading={isLoading} 
+            deletingId={deletingId}
           />
         </div>
 
@@ -187,7 +186,8 @@ export default function Dashboard() {
           <LoggingPanel 
             onLogFood={handleLogFood} 
             onSimulateScan={handleSimulateScan}
-            isLoading={isLoading}
+            isLogging={isLogging}
+            isScanning={isScanning}
           />
         </div>
       </div>

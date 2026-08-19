@@ -4,7 +4,7 @@ import React, { useState } from 'react';
  * LoggingPanel Component
  * Handles user inputs for logging meals manually or triggering the simulated AI scan.
  */
-export default function LoggingPanel({ onLogFood, onSimulateScan, isLoading }) {
+export default function LoggingPanel({ onLogFood, onSimulateScan, isLogging, isScanning }) {
   const [foodName, setFoodName] = useState('');
   const [grams, setGrams] = useState('');
   const [error, setError] = useState('');
@@ -13,7 +13,7 @@ export default function LoggingPanel({ onLogFood, onSimulateScan, isLoading }) {
     e.preventDefault();
     setError('');
 
-    // Client-side validations (intercepting obviously invalid inputs)
+    // Client-side validations
     if (!foodName.trim()) {
       setError('Please enter a food name.');
       return;
@@ -43,7 +43,7 @@ export default function LoggingPanel({ onLogFood, onSimulateScan, isLoading }) {
             placeholder="e.g. chicken, rice, salmon, apple"
             value={foodName}
             onChange={(e) => setFoodName(e.target.value)}
-            disabled={isLoading}
+            disabled={isLogging}
           />
         </div>
         <div className="form-group">
@@ -56,7 +56,7 @@ export default function LoggingPanel({ onLogFood, onSimulateScan, isLoading }) {
             placeholder="e.g. 150"
             value={grams}
             onChange={(e) => setGrams(e.target.value)}
-            disabled={isLoading}
+            disabled={isLogging}
           />
         </div>
         {error && (
@@ -64,8 +64,8 @@ export default function LoggingPanel({ onLogFood, onSimulateScan, isLoading }) {
             ⚠️ {error}
           </div>
         )}
-        <button className="btn-primary" type="submit" disabled={isLoading}>
-          {isLoading ? 'Adding...' : '➕ Log Food'}
+        <button className="btn-primary" type="submit" disabled={isLogging}>
+          {isLogging ? 'Adding...' : '➕ Log Food'}
         </button>
       </form>
       <div style={{ margin: '1rem 0', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
@@ -74,9 +74,9 @@ export default function LoggingPanel({ onLogFood, onSimulateScan, isLoading }) {
       <button 
         className="btn-secondary" 
         onClick={onSimulateScan}
-        disabled={isLoading}
+        disabled={isScanning}
       >
-        📸 Scan Meal Photo (AI Mock)
+        {isScanning ? '📸 Analyzing Photo...' : '📸 Scan Meal Photo (AI Mock)'}
       </button>
     </div>
   );
