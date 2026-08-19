@@ -5,7 +5,7 @@ import MacroBars from './components/MacroBars';
 import LoggingPanel from './components/LoggingPanel';
 import FoodHistoryList from './components/FoodHistoryList';
 import WarningModal from './components/WarningModal';
-import SuggestionCard from './components/SuggestionCard';
+import BalanceGauge from './components/BalanceGauge';
 import { 
   getFoodSummary, 
   addFoodItem, 
@@ -20,6 +20,7 @@ export default function App() {
   const [targets, setTargets] = useState({ calories: 2000, protein: 140, carbs: 220, fats: 65 });
   const [goal, setGoal] = useState('maintenance');
   const [status, setStatus] = useState('OK');
+  const [balanceScore, setBalanceScore] = useState({ score: 100, status: 'balanced' });
   const [isLoading, setIsLoading] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -49,6 +50,9 @@ export default function App() {
     setTargets(data.targets);
     setGoal(data.goal);
     setStatus(data.status);
+    if (data.balanceScore) {
+      setBalanceScore(data.balanceScore);
+    }
   };
 
   const handleLogFood = async (name, grams) => {
@@ -172,8 +176,8 @@ export default function App() {
           {/* Macronutrients Progress Bars */}
           <MacroBars totals={totals} targets={targets} />
 
-          {/* Smart Food Suggestions */}
-          <SuggestionCard totals={totals} targets={targets} />
+          {/* Macro Balance Score Gauge */}
+          <BalanceGauge score={balanceScore.score} status={balanceScore.status} />
 
           {/* Logged Meal History */}
           <FoodHistoryList 

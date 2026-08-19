@@ -1,3 +1,5 @@
+const { calculateBalanceScore } = require('./balanceScoreCalculator');
+
 const GOAL_TARGETS = {
   weightLoss: { calories: 1600, protein: 120, carbs: 150, fats: 50 },
   maintenance: { calories: 2000, protein: 140, carbs: 220, fats: 65 },
@@ -40,12 +42,15 @@ function getBudgetStatus() {
 }
 
 function getSummary() {
+  const totals = calculateTotals();
+  const targets = getGoalTargets();
   return {
     foods: loggedFoods,
-    totals: calculateTotals(),
-    targets: getGoalTargets(),
+    totals,
+    targets,
     goal: currentGoal,
-    status: getBudgetStatus()
+    status: getBudgetStatus(),
+    balanceScore: calculateBalanceScore(totals, targets)
   };
 }
 
