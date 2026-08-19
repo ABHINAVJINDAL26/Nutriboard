@@ -1,11 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 /**
  * useBalanceEasterEgg Hook
  * 
- * Listens for the user typing the word "balance" anywhere outside text inputs.
- * When triggered:
- * - Temporarily overrides the gauge display to 100 ("Well balanced") with demo label
+ * Multi-Platform Trigger Support:
+ * - Desktop: Listens for typing "balance" on keyboard (outside inputs)
+ * - Mobile / Touchscreen: Triggerable via double-tap callback on the gauge
+ * 
+ * Behavior:
+ * - Temporarily overrides gauge display to 100 ("Well balanced") with demo label
  * - Holds for 3 seconds, then cleanly reverts to the real score
  * - Enforces a 6-second cooldown to prevent overlapping animation queues
  * - Respects prefers-reduced-motion
@@ -17,6 +20,26 @@ export function useBalanceEasterEgg() {
   const cooldownRef = useRef(false);
   const timerRef = useRef(null);
   const cooldownTimerRef = useRef(null);
+
+  const triggerEasterEgg = useCallback(() => {
+    if (cooldownRef.current) return;
+    cooldownRef.current = true;
+    setIsTriggered(true);
+
+    // Clear any prior timers
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
+
+    // Hold demo state for 3 seconds, then restore real score
+    timerRef.current = setTimeout(() => {
+      setIsTriggered(false);
+    }, 3000);
+
+    // Reset cooldown after 6 seconds
+    cooldownTimerRef.current = setTimeout(() => {
+      cooldownRef.current = false;
+    }, 6000);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -44,31 +67,10 @@ export function useBalanceEasterEgg() {
 
         // 4. Check if the buffered keystrokes match "balance"
         if (bufferRef.current === 'balance') {
-          if (!cooldownRef.current) {
-            triggerEasterEgg();
-          }
+          triggerEasterEgg();
           bufferRef.current = '';
         }
       }
-    };
-
-    const triggerEasterEgg = () => {
-      cooldownRef.current = true;
-      setIsTriggered(true);
-
-      // Clear any prior timers
-      if (timerRef.current) clearTimeout(timerRef.current);
-      if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
-
-      // Hold demo state for 3 seconds, then restore real score
-      timerRef.current = setTimeout(() => {
-        setIsTriggered(false);
-      }, 3000);
-
-      // Reset cooldown after 6 seconds
-      cooldownTimerRef.current = setTimeout(() => {
-        cooldownRef.current = false;
-      }, 6000);
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -78,11 +80,11 @@ export function useBalanceEasterEgg() {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
     };
-  }, []);
+  }, [triggerEasterEgg]);
 
   const prefersReducedMotion = typeof window !== 'undefined' 
     && window.matchMedia 
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  return { isTriggered, prefersReducedMotion };
+  return { isTriggered, triggerEasterEgg, prefersReducedMotion };
 }

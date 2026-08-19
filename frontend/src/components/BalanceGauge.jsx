@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useBalanceEasterEgg } from '../hooks/useBalanceEasterEgg';
 
 export default function BalanceGauge({ score = 100, status = 'balanced' }) {
-  const { isTriggered, prefersReducedMotion } = useBalanceEasterEgg();
+  const { isTriggered, triggerEasterEgg, prefersReducedMotion } = useBalanceEasterEgg();
+  const lastTapRef = useRef(0);
+
+  // Mobile / Touchscreen Support: Double-tap on the gauge / 🎯 icon triggers easter egg
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 350) {
+      triggerEasterEgg();
+      lastTapRef.current = 0;
+    } else {
+      lastTapRef.current = now;
+    }
+  };
 
   // If easter egg triggered, show 100 / balanced without altering real data
   const displayScore = isTriggered ? 100 : score;
@@ -41,7 +53,12 @@ export default function BalanceGauge({ score = 100, status = 'balanced' }) {
   const currentStatus = statusConfig[displayStatus] || statusConfig.balanced;
 
   return (
-    <div className={`glass-card balance-gauge-card ${isTriggered ? 'easter-egg-active' : ''}`}>
+    <div 
+      className={`glass-card balance-gauge-card ${isTriggered ? 'easter-egg-active' : ''}`}
+      onClick={handleDoubleTap}
+      style={{ cursor: 'pointer', userSelect: 'none' }}
+      title="Tip: Double-tap or type 'balance' for demo state"
+    >
       <div className="balance-gauge-info">
         <div className="balance-gauge-header">
           <span className="balance-gauge-icon">🎯</span>
