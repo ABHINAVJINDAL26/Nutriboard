@@ -169,7 +169,7 @@ export default function App() {
 
       {/* Main Dashboard Layout */}
       <div className="dashboard-grid">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div className="dashboard-main-col">
           {/* Calorie Progress Bar */}
           <CalorieBar totals={totals} targets={targets} status={status} />
           
@@ -187,7 +187,7 @@ export default function App() {
           />
         </div>
 
-        <div>
+        <div className="dashboard-side-col">
           {/* Input Panel */}
           <LoggingPanel 
             onLogFood={handleLogFood} 
