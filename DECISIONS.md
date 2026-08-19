@@ -1,23 +1,23 @@
-# Engineering & Design Decisions — Tideline
+# Engineering & Design Decisions — Nutriboard
 
 ### 1. Why this design direction & what took longer than expected
 
-Most creator analytics dashboards feel like Bloomberg terminals crammed with 40 line charts, bounce rates, and vanity graphs that make people anxious. For Tideline, the whole premise was radical calm: deliver exactly three high-signal numbers once a week. 
+I wanted Nutriboard to feel like a high-end personal health HUD rather than a boring spreadsheet. I chose a dark glassmorphic interface with high-contrast neon accents so users can assess their caloric and macro status at a glance without visual fatigue.
 
-I deliberately avoided typical SaaS tropes—no purple gradient mesh blobs, no floating 3D glass cards, and no meaningless graphs. I anchored the layout on **Fraunces** (an optical serif with warm, editorial italics) paired with **Plus Jakarta Sans** for structure and **JetBrains Mono** for numbers. 
+Architecturally, I enforced a strict decoupled design: **all mathematical operations, portion scaling, goal limits, and balance scoring stay exclusively on the backend**. The frontend is purely a presentation layer that renders server state. 
 
-The part that took noticeably longer than expected was dialling in the hero's 60/40 desktop composition and optical sizing. At 1440px wide, the layout felt either cluttered or hollow. I spent nearly two hours tweaking line-heights, asymmetric padding, and max-widths so the manifesto card felt grounded next to the weekly digest mockup without needing filler icons or decorative shapes to balance the space.
+The piece that took longer than expected was getting the **Macro Balance Score** deviation formula right. Comparing raw grams didn't work because different goals (Weight Loss vs Muscle Gain) have wildly different total gram targets. I had to normalize both actual logged macros and goal targets into percentage splits (`protein%`, `carbs%`, `fats%`) before calculating absolute deviation. Handling the edge case where `totals.calories === 0` on first load was critical to avoid `NaN` or divide-by-zero crashes before any food was logged.
 
 ### 2. One trade-off made during development
 
-I chose a **zero-dependency, zero-build architecture**—plain semantic HTML5, modular CSS with Custom Properties, and native ES Modules. The page loads in under 150ms and has zero supply-chain overhead.
+I chose an **in-memory data store** over a full database like MongoDB or PostgreSQL. 
 
-The immediate trade-off was theme state management. Without a framework like React or Next.js to handle hydration, dark mode initially had a subtle white flash of unstyled content (FOUC) on hard reloads in dark mode. To fix it, I had to extract a tiny 4-line theme bootstrap script and place it blocking in the document `<head>` before the stylesheets load, reading `localStorage.getItem('tideline_theme')` and setting `document.documentElement.dataset.theme` synchronously before the browser paints the first frame.
+The upside was zero setup friction, sub-5ms API response times, and an architecture that is dead simple to demonstrate and trace during an assessment. The obvious trade-off is persistence—restarting the Node server resets the active food log. To keep this clean for future extension, I isolated all state mutations inside `budgetTracker.js` behind clean helper functions (`addFoodItem`, `deleteFoodItem`, `getSummary`), so swapping in a SQLite or Prisma persistence layer later requires touching only one file without altering any frontend API contracts.
 
 ### 3. AI usage & what was rejected
 
-I used an LLM to quickly scaffold the responsive CSS Grid syntax for the 3-metric card container and to generate clean, accessible SVG paths for the metric status indicators.
+I used an LLM to quickly scaffold the circular SVG geometry (`stroke-dasharray` / `stroke-dashoffset` radius math) for the `BalanceGauge` component and generate the initial Express route handler boilerplates.
 
-What I explicitly rejected was the initial visual direction the AI suggested. When I asked for an analytics dashboard hero, it generated a generic SaaS template loaded with a multi-colored line chart, animated circular progress bars, and glowing neon purple pill tags. That completely violated the core product brand. I deleted all the charting code and replaced it with a clean, physical email card format showing just three clear metrics: readers who finished, verified human replies, and 30-day cohort retention.
+What I explicitly rejected was the AI's suggestion to handle portion calculations and goal deviation math inside React `useEffect` hooks on the client. Doing math on the frontend would have leaked business logic, made state harder to synchronize across components, and broken the separation of concerns. I stripped out all client-side calculation logic and moved it into dedicated backend services (`nutrientCalculator.js`, `balanceScoreCalculator.js`).
 
-If I had one more full week, I wouldn't add more metrics or animations. I would build a live **Substack/RSS feed parser** where a creator enters their publication link and the digest card instantly populates with their actual real-world readership data instead of static mockup values.
+If I had one more full week, I would replace the simulated photo scanner with a real **camera stream integration using OpenAI's Vision API**, allowing users to snap an actual photo of their meal and receive estimated portion weights and macro breakdowns automatically.
