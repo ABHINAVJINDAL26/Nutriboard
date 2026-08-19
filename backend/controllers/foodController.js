@@ -1,5 +1,7 @@
 const { calculateNutrition, getMockScannedMeal } = require('../services/nutrientCalculator');
 const { getSummary, addFoodItem, deleteFoodItem, changeGoal } = require('../services/budgetTracker');
+const { getSuggestions } = require('../services/suggestionEngine');
+const { BASE_NUTRITION_PER_100G } = require('../data/foodBaseline');
 
 // GET /api/foods
 exports.getFoods = (req, res) => {
@@ -68,3 +70,16 @@ exports.updateGoal = (req, res) => {
     res.status(500).json({ error: 'Failed to update fitness goal' });
   }
 };
+
+// GET /api/suggestions
+exports.getSuggestions = (req, res) => {
+  try {
+    const summary = getSummary();
+    const remainingBudget = summary.targets.calories - summary.totals.calories;
+    const suggestions = getSuggestions(remainingBudget, BASE_NUTRITION_PER_100G);
+    res.status(200).json({ suggestions, remainingBudget });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve suggestions' });
+  }
+};
+
