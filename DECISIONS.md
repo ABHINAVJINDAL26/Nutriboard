@@ -12,12 +12,12 @@ The piece that took longer than expected was getting the **Macro Balance Score**
 
 I chose an **in-memory data store** over a full database like MongoDB or PostgreSQL. 
 
-The upside was zero setup friction, sub-5ms API response times, and an architecture that is dead simple to demonstrate and trace during an assessment. The obvious trade-off is persistence—restarting the Node server resets the active food log. To keep this clean for future extension, I isolated all state mutations inside `budgetTracker.js` behind clean helper functions (`addFoodItem`, `deleteFoodItem`, `getSummary`), so swapping in a SQLite or Prisma persistence layer later requires touching only one file without altering any frontend API contracts.
+The upside was zero setup friction, instant zero-latency API response times, and an architecture that is dead simple to demonstrate and trace during an assessment. The obvious trade-off is persistence—restarting the Node server resets the active food log. To keep this clean for future extension, I isolated all state mutations inside `budgetTracker.js` behind clean helper functions (`addFoodItem`, `deleteFoodItem`, `getSummary`), so swapping in a SQLite or Prisma persistence layer later requires touching only one file without altering any frontend API contracts.
 
 ### 3. AI usage & what was rejected
 
 I used an LLM to quickly scaffold the circular SVG geometry (`stroke-dasharray` / `stroke-dashoffset` radius math) for the `BalanceGauge` component and generate the initial Express route handler boilerplates.
 
-What I explicitly rejected was the AI's suggestion to handle portion calculations and goal deviation math inside React `useEffect` hooks on the client. Doing math on the frontend would have leaked business logic, made state harder to synchronize across components, and broken the separation of concerns. I stripped out all client-side calculation logic and moved it into dedicated backend services (`nutrientCalculator.js`, `balanceScoreCalculator.js`).
+What I explicitly rejected was the AI's suggestion to handle portion calculations and goal deviation math inside React `useEffect` hooks on the client. Doing math on the frontend would have leaked business logic, made state harder to synchronize across components, and broken the separation of concerns. I stripped out all client-side calculation logic and moved it into dedicated backend services (`nutrientCalculator.js`, `balanceScoreCalculator.js`). Similarly, for the theme-relevant "balance" Easter egg, I isolated the 7-keystroke buffer hook completely on the presentation layer (`useBalanceEasterEgg.js`) so temporary visual overrides never mutate backend state or real calculation variables.
 
 If I had one more full week, I would replace the simulated photo scanner with a real **camera stream integration using OpenAI's Vision API**, allowing users to snap an actual photo of their meal and receive estimated portion weights and macro breakdowns automatically.
