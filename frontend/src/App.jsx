@@ -1,207 +1,71 @@
-import React, { useState, useEffect } from 'react';
-import FitnessGoalToggle from './components/FitnessGoalToggle';
-import CalorieBar from './components/CalorieBar';
-import MacroBars from './components/MacroBars';
-import LoggingPanel from './components/LoggingPanel';
-import FoodHistoryList from './components/FoodHistoryList';
-import WarningModal from './components/WarningModal';
-import BalanceGauge from './components/BalanceGauge';
-import { 
-  getFoodSummary, 
-  addFoodItem, 
-  simulateImageUpload, 
-  deleteFoodItem, 
-  changeGoal 
-} from './api/foodApi';
+import React from 'react';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Features from './components/Features';
+import Footer from './components/Footer';
+import Dashboard from './components/Dashboard';
 
 export default function App() {
-  const [foods, setFoods] = useState([]);
-  const [totals, setTotals] = useState({ calories: 0, protein: 0, carbs: 0, fats: 0 });
-  const [targets, setTargets] = useState({ calories: 2000, protein: 140, carbs: 220, fats: 65 });
-  const [goal, setGoal] = useState('maintenance');
-  const [status, setStatus] = useState('OK');
-  const [balanceScore, setBalanceScore] = useState({ score: 100, status: 'balanced' });
-  const [isLoading, setIsLoading] = useState(false);
-  const [showWarningModal, setShowWarningModal] = useState(false);
-  const [apiError, setApiError] = useState('');
-
-  // Fetch initial summary from backend
-  useEffect(() => {
-    fetchSummary();
-  }, []);
-
-  const fetchSummary = async () => {
-    setIsLoading(true);
-    setApiError('');
-    try {
-      const data = await getFoodSummary();
-      updateDashboardState(data);
-    } catch (err) {
-      console.error(err);
-      setApiError('Unable to connect to the backend server. Make sure it is running on port 5000.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateDashboardState = (data) => {
-    setFoods(data.foods);
-    setTotals(data.totals);
-    setTargets(data.targets);
-    setGoal(data.goal);
-    setStatus(data.status);
-    if (data.balanceScore) {
-      setBalanceScore(data.balanceScore);
-    }
-  };
-
-  const handleLogFood = async (name, grams) => {
-    setIsLoading(true);
-    setApiError('');
-    try {
-      const data = await addFoodItem(name, grams);
-      const wasExceeded = status === 'EXCEEDED';
-      updateDashboardState(data);
-      
-      // If now exceeded and wasn't exceeded before, show popup warning
-      if (data.status === 'EXCEEDED' && !wasExceeded) {
-        setShowWarningModal(true);
-      }
-    } catch (err) {
-      console.error(err);
-      setApiError(err.message || 'Failed to log food item');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSimulateScan = async () => {
-    setIsLoading(true);
-    setApiError('');
-    try {
-      const data = await simulateImageUpload();
-      const wasExceeded = status === 'EXCEEDED';
-      updateDashboardState(data);
-
-      if (data.status === 'EXCEEDED' && !wasExceeded) {
-        setShowWarningModal(true);
-      }
-    } catch (err) {
-      console.error(err);
-      setApiError('Failed to simulate food scan');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDeleteFood = async (id) => {
-    setIsLoading(true);
-    setApiError('');
-    try {
-      const data = await deleteFoodItem(id);
-      updateDashboardState(data);
-    } catch (err) {
-      console.error(err);
-      setApiError('Failed to delete food item');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoalChange = async (newGoal) => {
-    setIsLoading(true);
-    setApiError('');
-    try {
-      const data = await changeGoal(newGoal);
-      const wasExceeded = status === 'EXCEEDED';
-      updateDashboardState(data);
-
-      // Trigger modal if changing goal lowers budget causing immediate exceed status
-      if (data.status === 'EXCEEDED' && !wasExceeded) {
-        setShowWarningModal(true);
-      }
-    } catch (err) {
-      console.error(err);
-      setApiError('Failed to update fitness goal');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1 className="app-title">VibeNutri</h1>
-        <p className="app-subtitle">Calorie Tracker & Real-Time Macro Dashboard</p>
-      </header>
+    <div className="landing-layout">
+      {/* 1. Header / Navbar */}
+      <Navbar />
 
-      {/* Fitness Goal Toggle */}
-      <FitnessGoalToggle activeGoal={goal} onGoalChange={handleGoalChange} />
+      <main className="landing-main">
+        {/* 2. Hero Section */}
+        <Hero />
 
-      {apiError && (
-        <div 
-          className="api-error-alert"
-          style={{
-            background: 'rgba(239, 68, 68, 0.15)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '12px',
-            padding: '1rem',
-            marginBottom: '2rem',
-            color: '#f87171',
-            textAlign: 'center',
-            fontSize: '0.9rem',
-            fontWeight: 500
-          }}
-        >
-          ⚠️ {apiError}
-        </div>
-      )}
+        {/* 3. Product Demo Section (Option A: Embedded Real Functional App) */}
+        <section id="product-demo" className="product-demo-section">
+          <div className="section-header">
+            <span className="demo-live-badge">
+              <span className="demo-pulsing-dot"></span>
+              LIVE INTERACTIVE PRODUCT DEMO
+            </span>
+            <h2 className="section-title">The Real Dashboard. Right Here.</h2>
+            <p className="section-subtitle">
+              This is the real, working dashboard connected to the live Node.js engine — not a mockup. 
+              Try logging a food item, watching the balance ring animate, or switching fitness goals below.
+            </p>
+          </div>
 
-      {/* Over-budget Alert Banner */}
-      {status === 'EXCEEDED' && (
-        <div className="exceeded-alert-banner">
-          <span className="alert-icon">⚠️</span>
-          <span className="alert-message">
-            Over Limit! You are currently exceeding your calorie budget for the day.
-          </span>
-        </div>
-      )}
+          {/* Realistic Browser-Chrome Container Frame */}
+          <div className="demo-browser-frame">
+            <div className="browser-frame-header">
+              <div className="browser-controls">
+                <span className="browser-dot dot-red"></span>
+                <span className="browser-dot dot-yellow"></span>
+                <span className="browser-dot dot-green"></span>
+              </div>
+              <div className="browser-address-bar">
+                <span className="browser-lock-icon">🔒</span>
+                <span className="browser-url-text">https://nutriboard.app/live-dashboard</span>
+              </div>
+              <div className="browser-status-tag">
+                <span className="live-status-dot"></span>
+                <span>Reactive Engine Online</span>
+              </div>
+            </div>
 
-      {/* Main Dashboard Layout */}
-      <div className="dashboard-grid">
-        <div className="dashboard-main-col">
-          {/* Calorie Progress Bar */}
-          <CalorieBar totals={totals} targets={targets} status={status} />
-          
-          {/* Macronutrients Progress Bars */}
-          <MacroBars totals={totals} targets={targets} />
+            <div className="browser-frame-body">
+              {/* Embedded Live Working Nutriboard App */}
+              <Dashboard />
+            </div>
+          </div>
 
-          {/* Macro Balance Score Gauge */}
-          <BalanceGauge score={balanceScore.score} status={balanceScore.status} />
+          <div className="demo-footer-caption">
+            <p>
+              💡 <strong>How to test:</strong> Try entering <code>rice</code> and <code>300g</code>, then click <strong>Log Food</strong>. Watch the <strong>Macro Balance Score</strong> animate in real time, then switch goals to <strong>Muscle Gain</strong> to see the target ratio instantly recalibrate.
+            </p>
+          </div>
+        </section>
 
-          {/* Logged Meal History */}
-          <FoodHistoryList 
-            foods={foods} 
-            onDeleteFood={handleDeleteFood} 
-            isLoading={isLoading} 
-          />
-        </div>
+        {/* 4. Feature Highlights */}
+        <Features />
+      </main>
 
-        <div className="dashboard-side-col">
-          {/* Input Panel */}
-          <LoggingPanel 
-            onLogFood={handleLogFood} 
-            onSimulateScan={handleSimulateScan}
-            isLoading={isLoading}
-          />
-        </div>
-      </div>
-
-      {/* Exceeded Warning Popup Modal */}
-      <WarningModal 
-        isOpen={showWarningModal} 
-        onClose={() => setShowWarningModal(false)} 
-      />
+      {/* 5. Minimal Honest Footer */}
+      <Footer />
     </div>
   );
 }
